@@ -62,9 +62,29 @@ export function deserialize<T = unknown>(value: unknown): T {
   if (typeof value == "string" || typeof value == "number" || typeof value == "boolean" || value == null || value == undefined) {
     return value as T;
   }
-  console.log(value)
-  
+  else if (typeof value === "object" && '__t' in value && '__v' in value) {
+    // Deserialize the Json object if it has '__t' and '__v' properties
+  if(value.__t == "Map" && Array.isArray(value.__v)){
+    const map = new Map();
+    for (const [key,val] of value.__v){
+      map.set(key,val);
+    }
+    return map as T;
+  }
+  else if(value.__t == "Set" && Array.isArray(value.__v)){
+    const set = new Set(value.__v);
+    
+    return set as T;
+  }
+  else if(value.__t == "Buffer" && Array.isArray(value.__v)){
+    const buffer = Buffer.from(value.__v);
+    return buffer as T;
+  }
 
-  
-  return;
+  else if(value.__t == "Date" && typeof value.__v == 'number'){
+    const date = new Date(value.__v);
+    return date as T;
+  }
+}
+
 }
